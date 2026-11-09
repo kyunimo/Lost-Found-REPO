@@ -1,20 +1,12 @@
 export type Role = "user" | "staff" | "admin";
 export type Status = "lost" | "found" | "pending" | "recovered";
 
-<<<<<<< HEAD
-export interface Profile { id: string; full_name: string; email: string; role: Role; }
-
-export interface Item {
-  id: number; name: string; category: string; status: Status; location: string;
-  item_date: string; description: string; contact: string; image_url: string | null;
-=======
 export interface Profile { id: string; full_name: string; email: string; role: Role; created_at?: string;
   contact_1?: string; contact_2?: string; contact_3?: string; }
 
 export interface Item {
   id: number; name: string; category: string; status: Status; location: string;
   item_date: string; description: string; contact: string; contact_2?: string; contact_3?: string; image_url: string | null;
->>>>>>> 4d6617f (v5)
   reported_by: string; reporter_name: string; created_at: string;
 }
 

@@ -9,12 +9,9 @@ create table public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   full_name text not null default '',
   email text,
-<<<<<<< HEAD
-=======
   contact_1 text not null default '',
   contact_2 text not null default '',
   contact_3 text not null default '',
->>>>>>> 4d6617f (v5)
   role text not null default 'user' check (role in ('user','staff','admin')),
   created_at timestamptz not null default now()
 );
@@ -42,11 +39,7 @@ create policy "update own row" on public.profiles for update to authenticated
   using (id = auth.uid()) with check (id = auth.uid());
 -- users may only ever change their own name, never their role
 revoke update on public.profiles from authenticated, anon;
-<<<<<<< HEAD
-grant update (full_name) on public.profiles to authenticated;
-=======
 grant update (full_name, contact_1, contact_2, contact_3) on public.profiles to authenticated;
->>>>>>> 4d6617f (v5)
 
 -- ITEMS ------------------------------------------------------
 create table public.items (
@@ -58,15 +51,10 @@ create table public.items (
   item_date date not null default current_date,
   description text not null,
   contact text not null,
-<<<<<<< HEAD
-  image_url text,
-  reported_by uuid not null default auth.uid() references public.profiles(id),
-=======
   contact_2 text not null default '',
   contact_3 text not null default '',
   image_url text,
   reported_by uuid not null default auth.uid() references public.profiles(id) on delete cascade,
->>>>>>> 4d6617f (v5)
   reporter_name text not null default '',
   created_at timestamptz not null default now()
 );
@@ -83,11 +71,7 @@ create policy "admin delete" on public.items for delete to authenticated
 create table public.claims (
   id bigint generated always as identity primary key,
   item_id bigint not null references public.items(id) on delete cascade,
-<<<<<<< HEAD
-  claimant_id uuid not null default auth.uid() references public.profiles(id),
-=======
   claimant_id uuid not null default auth.uid() references public.profiles(id) on delete cascade,
->>>>>>> 4d6617f (v5)
   claimant_name text not null,
   contact text not null,
   notes text not null,
@@ -225,8 +209,6 @@ revoke all on function public.mark_found(bigint), public.submit_claim(bigint, te
 grant execute on function public.mark_found(bigint), public.submit_claim(bigint, text, text, text),
   public.resolve_claim(bigint, boolean), public.set_user_role(uuid, text),
   public.suggest_matches(bigint) to authenticated;
-<<<<<<< HEAD
-=======
 
 -- allow removing photos: own folder, or any folder for admins (account cleanup)
 drop policy if exists "photos delete own" on storage.objects;
@@ -275,4 +257,3 @@ end $$;
 
 revoke all on function public.delete_my_account(), public.admin_delete_user(uuid) from public, anon;
 grant execute on function public.delete_my_account(), public.admin_delete_user(uuid) to authenticated;
->>>>>>> 4d6617f (v5)

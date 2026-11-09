@@ -1,8 +1,5 @@
 @import "tailwindcss";
 
-<<<<<<< HEAD
-body { font-family: "Inter", system-ui, sans-serif; }
-=======
 html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; }
 body { font-family: "Inter", system-ui, sans-serif; overscroll-behavior-y: none; }
 button, a { touch-action: manipulation; }
@@ -65,4 +62,3 @@ button, a { touch-action: manipulation; }
 .dark :is(.text-purple-700) { color: #d8b4fe; }
 /* keep white text on solid coloured buttons */
 .dark :is(.bg-indigo-600, .bg-indigo-500, .bg-red-500, .bg-emerald-500, .bg-emerald-600) { color: #fff; }
->>>>>>> 4d6617f (v5)

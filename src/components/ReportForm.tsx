@@ -6,30 +6,29 @@ const locations = ["Main Building", "Library", "Gymnasium", "Cafeteria", "Parkin
 
 interface Props {
   type: "lost" | "found";
-<<<<<<< HEAD
-  defaultContact: string;
-  onSubmit: (data: any, file: File | null) => Promise<boolean>;
-}
-
-export function ReportForm({ type, defaultContact, onSubmit }: Props) {
-=======
   defaults: { contact: string; contact_2: string; contact_3: string };
   onSubmit: (data: any, file: File | null) => Promise<boolean>;
   onViewItems: () => void;
   viewLabel: string;
 }
 
+const makeForm = (defaults: Props["defaults"]) => ({
+  name: "",
+  category: "",
+  location: "",
+  item_date: "",
+  description: "",
+  contact: defaults.contact,
+  contact_2: defaults.contact_2,
+  contact_3: defaults.contact_3,
+});
+
 export function ReportForm({ type, defaults, onSubmit, onViewItems, viewLabel }: Props) {
->>>>>>> 4d6617f (v5)
   const [submitted, setSubmitted] = useState(false);
   const [busy, setBusy] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
-<<<<<<< HEAD
-  const [form, setForm] = useState({ name: "", category: "", location: "", item_date: "", description: "", contact: defaultContact });
-=======
-  const [form, setForm] = useState({ name: "", category: "", location: "", item_date: "", description: "", ...defaults });
->>>>>>> 4d6617f (v5)
+  const [form, setForm] = useState(() => makeForm(defaults));
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -47,22 +46,22 @@ export function ReportForm({ type, defaults, onSubmit, onViewItems, viewLabel }:
     setBusy(true);
     const ok = await onSubmit({ ...form, status: type }, file);
     setBusy(false);
-<<<<<<< HEAD
     if (ok) {
       setSubmitted(true);
       setTimeout(() => {
-        setSubmitted(false); setFile(null); setPreview(null);
-        setForm({ name: "", category: "", location: "", item_date: "", description: "", contact: defaultContact });
+        setSubmitted(false);
+        setFile(null);
+        setPreview(null);
+        setForm(makeForm(defaults));
       }, 2500);
     }
-=======
-    if (ok) setSubmitted(true);
   };
 
   const reportAnother = () => {
-    setSubmitted(false); setFile(null); setPreview(null);
-    setForm({ name: "", category: "", location: "", item_date: "", description: "", ...defaults });
->>>>>>> 4d6617f (v5)
+    setSubmitted(false);
+    setFile(null);
+    setPreview(null);
+    setForm(makeForm(defaults));
   };
 
   const isLost = type === "lost";
@@ -79,8 +78,6 @@ export function ReportForm({ type, defaults, onSubmit, onViewItems, viewLabel }:
         <p className="text-gray-500 text-sm max-w-sm">
           {isLost ? "Your report is saved. Check the item's details to see possible matches." : "Thank you! The owner can now find and claim it."}
         </p>
-<<<<<<< HEAD
-=======
         <div className="flex flex-col sm:flex-row gap-3 mt-6 w-full sm:w-auto">
           <button onClick={onViewItems} className="px-5 py-2.5 rounded-xl text-sm text-white bg-indigo-600 hover:bg-indigo-700 font-semibold">
             Return to {viewLabel}
@@ -89,7 +86,6 @@ export function ReportForm({ type, defaults, onSubmit, onViewItems, viewLabel }:
             Report another item
           </button>
         </div>
->>>>>>> 4d6617f (v5)
       </div>
     );
   }
@@ -118,11 +114,7 @@ export function ReportForm({ type, defaults, onSubmit, onViewItems, viewLabel }:
           placeholder={isLost ? "e.g. Black Leather Wallet" : "e.g. Blue Umbrella"} />
       </div>
 
-<<<<<<< HEAD
-      <div className="grid grid-cols-2 gap-4">
-=======
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
->>>>>>> 4d6617f (v5)
         <div>
           <label className={label}>Category <span className="text-red-500">*</span></label>
           <select name="category" value={form.category} onChange={handleChange} required className={field}>
@@ -154,16 +146,12 @@ export function ReportForm({ type, defaults, onSubmit, onViewItems, viewLabel }:
 
       <div>
         <label className={label}>Contact Information <span className="text-red-500">*</span></label>
-<<<<<<< HEAD
-        <input name="contact" value={form.contact} onChange={handleChange} required placeholder="Email or phone number" className={field} />
-=======
         <div className="space-y-2.5">
           <input name="contact" value={form.contact} onChange={handleChange} required placeholder="Contact 1 — phone or email (required)" className={field} />
           <input name="contact_2" value={form.contact_2} onChange={handleChange} placeholder="Contact 2 (optional)" className={field} />
           <input name="contact_3" value={form.contact_3} onChange={handleChange} placeholder="Contact 3 (optional)" className={field} />
         </div>
         <p className="text-xs text-gray-400 mt-1">Pre-filled from your Profile settings. Shown to you and campus staff.</p>
->>>>>>> 4d6617f (v5)
       </div>
 
       <button type="submit" disabled={busy}
