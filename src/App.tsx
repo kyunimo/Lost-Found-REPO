@@ -2,18 +2,34 @@ import { useCallback, useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import {
   Search, Bell, User, LayoutDashboard, PackageSearch, PackagePlus, ShieldCheck, TrendingUp,
+<<<<<<< HEAD
   CheckCircle2, AlertCircle, Clock, Filter, X, Plus, Eye, Trash2, CheckCheck, XCircle, Users, LogOut,
+=======
+  CheckCircle2, AlertCircle, Clock, Filter, X, Plus, Eye, Trash2, CheckCheck, XCircle, Users, LogOut, Moon, Sun, ArrowLeft,
+>>>>>>> 4d6617f (v5)
 } from "lucide-react";
 import { supabase } from "./lib/supabase";
 import { Activity, Claim, fmtDate, Item, Profile, Role, timeAgo } from "./lib/types";
 import { ItemCard } from "./components/ItemCard";
 import { ReportForm } from "./components/ReportForm";
 import { AuthPage } from "./components/AuthPage";
+<<<<<<< HEAD
 
 function StatCard({ label, value, icon: Icon, color, bg }: any) {
   return (
     <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm flex items-center gap-4">
       <div className={`w-12 h-12 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+=======
+import { ProfilePage } from "./components/ProfilePage";
+import { useTheme } from "./lib/theme";
+import { DeleteAccountModal } from "./components/DeleteAccountModal";
+import { listUserPhotos, removePhotos } from "./lib/accounts";
+
+function StatCard({ label, value, icon: Icon, color, bg }: any) {
+  return (
+    <div className="bg-white rounded-2xl p-3 sm:p-5 border border-gray-100 shadow-sm flex items-center gap-3 sm:gap-4">
+      <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${bg} flex items-center justify-center shrink-0`}>
+>>>>>>> 4d6617f (v5)
         <Icon size={22} className={color} />
       </div>
       <div>
@@ -28,7 +44,11 @@ type ToastT = { message: string; type: "success" | "info" | "warning" };
 function Toast({ message, type }: ToastT) {
   const colors = { success: "bg-emerald-600", info: "bg-indigo-600", warning: "bg-yellow-500" };
   return (
+<<<<<<< HEAD
     <div className={`fixed top-5 left-1/2 -translate-x-1/2 z-[100] ${colors[type]} text-white text-sm px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-sm`}>
+=======
+    <div className={`fixed top-[calc(1.25rem+env(safe-area-inset-top))] left-1/2 -translate-x-1/2 z-[100] ${colors[type]} text-white text-sm px-5 py-3 rounded-xl shadow-lg flex items-center gap-2 max-w-[calc(100vw-2rem)] sm:max-w-sm`}>
+>>>>>>> 4d6617f (v5)
       <CheckCircle2 size={16} className="shrink-0" /> {message}
     </div>
   );
@@ -57,6 +77,14 @@ export default function App() {
   const [adminFilter, setAdminFilter] = useState("all");
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [toast, setToast] = useState<ToastT | null>(null);
+<<<<<<< HEAD
+=======
+  const [backTab, setBackTab] = useState("dashboard");
+  const [userToDelete, setUserToDelete] = useState<Profile | null>(null);
+  const [deletingUser, setDeletingUser] = useState(false);
+  const [notice, setNotice] = useState("");
+  const { theme, toggle: toggleTheme } = useTheme();
+>>>>>>> 4d6617f (v5)
 
   const role: Role = profile?.role ?? "user";
   const isStaff = role === "staff" || role === "admin";
@@ -65,7 +93,11 @@ export default function App() {
   // ── Auth ──────────────────────────────────────────────────────────────
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => { setSession(data.session); setAuthLoading(false); });
+<<<<<<< HEAD
     const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => setSession(s));
+=======
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => { setSession(s); if (s) setNotice(""); });
+>>>>>>> 4d6617f (v5)
     return () => sub.subscription.unsubscribe();
   }, []);
 
@@ -97,6 +129,17 @@ export default function App() {
 
   useEffect(() => { if (profile) loadAll(); }, [profile, loadAll]);
 
+<<<<<<< HEAD
+=======
+  // phones: refresh the lists when the user switches back to the tab/app
+  useEffect(() => {
+    if (!profile) return;
+    const onVisible = () => { if (document.visibilityState === "visible") loadAll(); };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => document.removeEventListener("visibilitychange", onVisible);
+  }, [profile, loadAll]);
+
+>>>>>>> 4d6617f (v5)
   // run a database action, show a toast, refresh
   const run = async (action: () => PromiseLike<{ error: any }>, ok: string, type: ToastT["type"] = "success") => {
     const { error } = await action();
@@ -119,7 +162,10 @@ export default function App() {
       () => supabase.from("items").insert({ ...form, image_url, reported_by: session!.user.id, reporter_name: profile!.full_name }),
       form.status === "lost" ? `Lost item "${form.name}" reported.` : `Found item "${form.name}" submitted.`
     );
+<<<<<<< HEAD
     if (ok) setTimeout(() => setActiveTab(form.status === "lost" ? "lost" : "found"), 2600);
+=======
+>>>>>>> 4d6617f (v5)
     return ok;
   };
 
@@ -139,6 +185,24 @@ export default function App() {
     setDeletingId(null);
     await run(() => supabase.from("items").delete().eq("id", id), "Report deleted.", "warning");
   };
+<<<<<<< HEAD
+=======
+  const confirmDeleteUser = async () => {
+    if (!userToDelete) return;
+    const u = userToDelete;
+    setDeletingUser(true);
+    const photos = await listUserPhotos(u.id);
+    const ok = await run(() => supabase.rpc("admin_delete_user", { p_user: u.id }), `Account of ${u.full_name || u.email} deleted.`, "warning");
+    setDeletingUser(false);
+    if (ok) { await removePhotos(photos); setUserToDelete(null); }
+  };
+  const handleAccountDeleted = () => {
+    setNotice("Your account has been deleted.");
+    setActiveTab("dashboard");
+    supabase.auth.signOut({ scope: "local" });
+  };
+
+>>>>>>> 4d6617f (v5)
   const handleRole = async (u: Profile, newRole: string) => {
     await run(() => supabase.rpc("set_user_role", { p_user: u.id, p_role: newRole }), `${u.full_name || u.email} is now ${newRole}.`);
   };
@@ -160,6 +224,7 @@ export default function App() {
   const adminItems = items.filter((i) => adminFilter === "all" || i.status === adminFilter);
 
   const navItems = [
+<<<<<<< HEAD
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "lost", label: "Lost Items", icon: AlertCircle },
     { id: "found", label: "Found Items", icon: CheckCircle2 },
@@ -173,10 +238,30 @@ export default function App() {
   const card = (item: Item) => (
     <ItemCard key={item.id} item={item} userId={session!.user.id} isStaff={isStaff}
       defaultName={profile?.full_name ?? ""} defaultContact={profile?.email ?? ""}
+=======
+    { id: "dashboard", label: "Dashboard", short: "Home", icon: LayoutDashboard },
+    { id: "lost", label: "Lost Items", short: "Lost", icon: AlertCircle },
+    { id: "found", label: "Found Items", short: "Found", icon: CheckCircle2 },
+    { id: "report", label: "Report Item", short: "Report", icon: PackagePlus },
+    ...(isStaff ? [{ id: "admin", label: "Admin Panel", short: "Admin", icon: ShieldCheck }] : []),
+    ...(isAdmin ? [{ id: "users", label: "Users", short: "Users", icon: Users }] : []),
+    { id: "profile", label: "Profile", short: "Profile", icon: User },
+  ];
+
+  const navigate = (tab: string) => {
+    if (tab === "report" && activeTab !== "report") setBackTab(activeTab); // remembered for the Back button
+    setActiveTab(tab); setSearchQuery(""); setFilterStatus("all");
+  };
+
+  const card = (item: Item) => (
+    <ItemCard key={item.id} item={item} userId={session!.user.id} isStaff={isStaff}
+      defaultName={profile?.full_name ?? ""} defaultContact={profile?.contact_1 || profile?.email || ""}
+>>>>>>> 4d6617f (v5)
       onClaim={handleClaim} onFoundIt={handleFoundIt} />
   );
 
   // ── Gates ─────────────────────────────────────────────────────────────
+<<<<<<< HEAD
   if (authLoading) return <div className="min-h-screen flex items-center justify-center text-gray-400 text-sm">Loading…</div>;
   if (!session) return <AuthPage />;
   if (!profile) return <div className="min-h-screen flex items-center justify-center text-gray-400 text-sm">Loading your profile…</div>;
@@ -184,6 +269,15 @@ export default function App() {
   // ── Render ────────────────────────────────────────────────────────────
   return (
     <div className="h-screen bg-gray-50 flex flex-col">
+=======
+  if (authLoading) return <div className="min-h-dvh flex items-center justify-center text-gray-400 text-sm">Loading…</div>;
+  if (!session) return <AuthPage theme={theme} onToggleTheme={toggleTheme} notice={notice} />;
+  if (!profile) return <div className="min-h-dvh flex items-center justify-center text-gray-400 text-sm">Loading your profile…</div>;
+
+  // ── Render ────────────────────────────────────────────────────────────
+  return (
+    <div className="h-dvh bg-gray-50 flex flex-col">
+>>>>>>> 4d6617f (v5)
       {toast && <Toast {...toast} />}
 
       {deletingId !== null && (
@@ -200,6 +294,16 @@ export default function App() {
         </div>
       )}
 
+<<<<<<< HEAD
+=======
+      {userToDelete && (
+        <DeleteAccountModal self={false} title="Delete this account?" who={userToDelete.full_name || userToDelete.email}
+          reports={items.filter((i) => i.reported_by === userToDelete.id).length}
+          claims={claims.filter((c) => c.claimant_id === userToDelete.id).length}
+          busy={deletingUser} onCancel={() => setUserToDelete(null)} onConfirm={confirmDeleteUser} />
+      )}
+
+>>>>>>> 4d6617f (v5)
       <div className="flex flex-1 overflow-hidden">
         <aside className="hidden md:flex flex-col w-60 bg-white border-r border-gray-100 shrink-0">
           <div className="px-6 py-5 border-b border-gray-100 flex items-center gap-2.5">
@@ -223,21 +327,38 @@ export default function App() {
           </nav>
           <div className="p-4 border-t border-gray-100">
             <div className="flex items-center gap-3 px-2 py-2">
+<<<<<<< HEAD
               <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0"><User size={15} className="text-indigo-600" /></div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm text-gray-800 truncate font-semibold">{profile.full_name || "Unnamed"}</p>
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${roleBadge[role]}`}>{role}</span>
               </div>
+=======
+              <button onClick={() => navigate("profile")} className="flex items-center gap-3 flex-1 min-w-0 text-left">
+                <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center shrink-0"><User size={15} className="text-indigo-600" /></div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-800 truncate font-semibold">{profile.full_name || "Unnamed"}</p>
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full capitalize ${roleBadge[role]}`}>{role}</span>
+                </div>
+              </button>
+>>>>>>> 4d6617f (v5)
               <button title="Sign out" onClick={() => supabase.auth.signOut()} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-red-500"><LogOut size={15} /></button>
             </div>
           </div>
         </aside>
 
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+<<<<<<< HEAD
           <header className="bg-white border-b border-gray-100 px-4 md:px-6 py-3.5 flex items-center gap-3 shrink-0">
             <h1 className="text-gray-900 font-bold text-[1.05rem]">{navItems.find((n) => n.id === activeTab)?.label}</h1>
             {(activeTab === "lost" || activeTab === "found") && (
               <div className="flex-1 max-w-sm ml-4 relative">
+=======
+          <header className="bg-white border-b border-gray-100 px-4 md:px-6 pb-3 pt-[calc(0.75rem+env(safe-area-inset-top))] md:pt-3 flex items-center gap-3 shrink-0 flex-wrap md:flex-nowrap">
+            <h1 className="text-gray-900 font-bold text-[1.05rem]">{navItems.find((n) => n.id === activeTab)?.label}</h1>
+            {(activeTab === "lost" || activeTab === "found") && (
+              <div className="order-last w-full md:order-none md:w-auto md:flex-1 md:max-w-sm md:ml-4 relative">
+>>>>>>> 4d6617f (v5)
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                 <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search by name, location, category…"
                   className="w-full pl-9 pr-4 py-2 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-200" />
@@ -251,6 +372,7 @@ export default function App() {
                   {pendingClaims.length > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500" />}
                 </button>
               )}
+<<<<<<< HEAD
               <button title="Sign out" onClick={() => supabase.auth.signOut()} className="md:hidden p-2 rounded-xl hover:bg-gray-100 text-gray-500"><LogOut size={18} /></button>
             </div>
           </header>
@@ -265,6 +387,24 @@ export default function App() {
                   <div className="flex gap-3 mt-4 flex-wrap">
                     <button onClick={() => navigate("report")} className="flex items-center gap-1.5 bg-white text-indigo-600 px-4 py-2 rounded-xl text-sm hover:bg-indigo-50 font-semibold"><Plus size={15} /> Report Item</button>
                     <button onClick={() => navigate("lost")} className="flex items-center gap-1.5 bg-indigo-500 text-white px-4 py-2 rounded-xl text-sm hover:bg-indigo-400 font-semibold"><Search size={15} /> Browse Items</button>
+=======
+              <button title="Toggle dark mode" aria-label="Toggle dark mode" onClick={toggleTheme} className="p-2 rounded-xl hover:bg-gray-100 text-gray-600">
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+            </div>
+          </header>
+
+          <main className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-6">
+            {activeTab === "dashboard" && (
+              <div className="space-y-6">
+                <div className="relative bg-indigo-600 rounded-2xl overflow-hidden p-5 sm:p-6 text-white">
+                  <p className="text-indigo-200 text-sm mb-1">Welcome back, {profile.full_name || "friend"}</p>
+                  <h2 className="font-bold text-lg sm:text-xl mb-1">STI College Gensan Lost &amp; Found Portal</h2>
+                  <p className="text-indigo-200 text-sm max-w-md">Helping students, faculty, and staff recover lost belongings efficiently.</p>
+                  <div className="flex gap-3 mt-4 flex-wrap">
+                    <button onClick={() => navigate("report")} className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 bg-white text-indigo-600 px-4 py-2.5 rounded-xl text-sm hover:bg-indigo-50 font-semibold"><Plus size={15} /> Report Item</button>
+                    <button onClick={() => navigate("lost")} className="flex-1 sm:flex-none justify-center flex items-center gap-1.5 bg-indigo-500 text-white px-4 py-2.5 rounded-xl text-sm hover:bg-indigo-400 font-semibold"><Search size={15} /> Browse Items</button>
+>>>>>>> 4d6617f (v5)
                   </div>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -303,10 +443,17 @@ export default function App() {
               <div className="space-y-5">
                 <div className="flex items-center gap-3 flex-wrap">
                   {activeTab === "found" && (
+<<<<<<< HEAD
                     <div className="flex bg-white border border-gray-200 rounded-xl p-1 gap-1">
                       {[["all", "All"], ["found", "Found"], ["pending", "Claim Pending"], ["recovered", "Recovered"]].map(([v, l]) => (
                         <button key={v} onClick={() => setFilterStatus(v)}
                           className={`px-3 py-1.5 rounded-lg text-xs ${filterStatus === v ? "bg-indigo-600 text-white font-semibold" : "text-gray-500 hover:text-gray-800"}`}>{l}</button>
+=======
+                    <div className="flex bg-white border border-gray-200 rounded-xl p-1 gap-1 max-w-full overflow-x-auto">
+                      {[["all", "All"], ["found", "Found"], ["pending", "Claim Pending"], ["recovered", "Recovered"]].map(([v, l]) => (
+                        <button key={v} onClick={() => setFilterStatus(v)}
+                          className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs whitespace-nowrap shrink-0 ${filterStatus === v ? "bg-indigo-600 text-white font-semibold" : "text-gray-500 hover:text-gray-800"}`}>{l}</button>
+>>>>>>> 4d6617f (v5)
                       ))}
                     </div>
                   )}
@@ -328,16 +475,36 @@ export default function App() {
 
             {activeTab === "report" && (
               <div className="max-w-xl mx-auto">
+<<<<<<< HEAD
+=======
+                <button onClick={() => navigate(backTab)} className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-indigo-600 mb-4 font-medium">
+                  <ArrowLeft size={16} /> Back to {navItems.find((n) => n.id === backTab)?.label ?? "Dashboard"}
+                </button>
+>>>>>>> 4d6617f (v5)
                 <div className="flex bg-white border border-gray-200 rounded-2xl p-1.5 gap-1 mb-6">
                   <button onClick={() => setReportType("lost")} className={`flex-1 py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 font-semibold ${reportType === "lost" ? "bg-red-500 text-white shadow-sm" : "text-gray-600"}`}><AlertCircle size={15} /> Report Lost Item</button>
                   <button onClick={() => setReportType("found")} className={`flex-1 py-2.5 rounded-xl text-sm flex items-center justify-center gap-2 font-semibold ${reportType === "found" ? "bg-emerald-500 text-white shadow-sm" : "text-gray-600"}`}><CheckCircle2 size={15} /> Report Found Item</button>
                 </div>
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+<<<<<<< HEAD
                   <ReportForm key={reportType} type={reportType} defaultContact={profile.email ?? ""} onSubmit={handleAddItem} />
+=======
+                  <ReportForm key={reportType} type={reportType} defaults={{ contact: profile.contact_1 || profile.email || "", contact_2: profile.contact_2 ?? "", contact_3: profile.contact_3 ?? "" }} onSubmit={handleAddItem}
+                    onViewItems={() => navigate(reportType === "lost" ? "lost" : "found")} viewLabel={reportType === "lost" ? "Lost Items" : "Found Items"} />
+>>>>>>> 4d6617f (v5)
                 </div>
               </div>
             )}
 
+<<<<<<< HEAD
+=======
+            {activeTab === "profile" && (
+              <ProfilePage profile={profile} items={items} claims={claims} theme={theme} onToggleTheme={toggleTheme}
+                onNameSaved={(n) => setProfile({ ...profile, full_name: n })} notify={showToast} onSignOut={() => supabase.auth.signOut()}
+                onContactsSaved={(c) => setProfile({ ...profile, ...c })} onDeleted={handleAccountDeleted} />
+            )}
+
+>>>>>>> 4d6617f (v5)
             {activeTab === "admin" && isStaff && (
               <div className="space-y-6">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -372,8 +539,13 @@ export default function App() {
                             <p className="text-xs text-gray-600">{c.notes}</p>
                           </div>
                           <div className="flex gap-2">
+<<<<<<< HEAD
                             <button onClick={() => handleResolve(c, true)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-emerald-500 text-white text-xs hover:bg-emerald-600 font-semibold"><CheckCheck size={13} /> Approve</button>
                             <button onClick={() => handleResolve(c, false)} className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg bg-gray-200 text-gray-700 text-xs hover:bg-red-100 hover:text-red-600 font-semibold"><XCircle size={13} /> Reject</button>
+=======
+                            <button onClick={() => handleResolve(c, true)} className="flex-1 flex items-center justify-center gap-1.5 py-3 sm:py-2 rounded-lg bg-emerald-500 text-white text-sm sm:text-xs hover:bg-emerald-600 font-semibold"><CheckCheck size={13} /> Approve</button>
+                            <button onClick={() => handleResolve(c, false)} className="flex-1 flex items-center justify-center gap-1.5 py-3 sm:py-2 rounded-lg bg-gray-200 text-gray-700 text-sm sm:text-xs hover:bg-red-100 hover:text-red-600 font-semibold"><XCircle size={13} /> Reject</button>
+>>>>>>> 4d6617f (v5)
                           </div>
                         </div>
                       ))}
@@ -384,16 +556,45 @@ export default function App() {
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                   <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 flex-wrap gap-3">
                     <h3 className="font-bold text-gray-900">All Reports ({items.length})</h3>
+<<<<<<< HEAD
                     <div className="flex items-center gap-2">
                       <Filter size={14} className="text-gray-400" />
                       <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5">
                         {["all", "lost", "found", "pending", "recovered"].map((f) => (
                           <button key={f} onClick={() => setAdminFilter(f)} className={`px-2.5 py-1 rounded-md text-xs capitalize ${adminFilter === f ? "bg-white text-gray-800 shadow-sm font-semibold" : "text-gray-500"}`}>{f}</button>
+=======
+                    <div className="flex items-center gap-2 w-full md:w-auto min-w-0">
+                      <Filter size={14} className="text-gray-400" />
+                      <div className="flex bg-gray-100 rounded-lg p-0.5 gap-0.5 min-w-0 overflow-x-auto">
+                        {["all", "lost", "found", "pending", "recovered"].map((f) => (
+                          <button key={f} onClick={() => setAdminFilter(f)} className={`px-3 py-1.5 sm:px-2.5 sm:py-1 rounded-md text-xs capitalize whitespace-nowrap shrink-0 ${adminFilter === f ? "bg-white text-gray-800 shadow-sm font-semibold" : "text-gray-500"}`}>{f}</button>
+>>>>>>> 4d6617f (v5)
                         ))}
                       </div>
                     </div>
                   </div>
+<<<<<<< HEAD
                   <div className="overflow-x-auto">
+=======
+                  <div className="md:hidden divide-y divide-gray-100">
+                    {adminItems.map((r) => (
+                      <div key={r.id} className="p-4 flex items-start gap-3">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-semibold text-gray-800 truncate">{r.name}</p>
+                          <p className="text-xs text-gray-500">{r.location} · {fmtDate(r.item_date)}</p>
+                          <p className="text-xs text-gray-400 truncate">By {r.reporter_name}</p>
+                        </div>
+                        <span className="px-2 py-0.5 rounded-full text-xs capitalize bg-gray-100 text-gray-700 font-semibold shrink-0">{r.status}</span>
+                        <div className="flex items-center shrink-0">
+                          <button title="View" onClick={() => navigate(r.status === "lost" ? "lost" : "found")} className="p-2 rounded-lg text-gray-500"><Eye size={16} /></button>
+                          {isAdmin && <button title="Delete" onClick={() => setDeletingId(r.id)} className="p-2 rounded-lg text-gray-500"><Trash2 size={16} /></button>}
+                        </div>
+                      </div>
+                    ))}
+                    {adminItems.length === 0 && <p className="md:hidden text-center py-8 text-gray-400 text-sm">No items match this filter.</p>}
+                  </div>
+                  <div className="hidden md:block overflow-x-auto">
+>>>>>>> 4d6617f (v5)
                     <table className="w-full">
                       <thead><tr className="bg-gray-50 text-left text-xs text-gray-500">
                         {["Reported By", "Item", "Date", "Location", "Status", "Actions"].map((h) => <th key={h} className="px-6 py-3 font-semibold">{h}</th>)}
@@ -425,10 +626,35 @@ export default function App() {
             {activeTab === "users" && isAdmin && (
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
                 <div className="px-6 py-4 border-b border-gray-100"><h3 className="font-bold text-gray-900">Users ({users.length})</h3></div>
+<<<<<<< HEAD
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead><tr className="bg-gray-50 text-left text-xs text-gray-500">
                       {["Name", "Email", "Role"].map((h) => <th key={h} className="px-6 py-3 font-semibold">{h}</th>)}
+=======
+                <div className="md:hidden divide-y divide-gray-100">
+                  {users.map((u) => (
+                    <div key={u.id} className="p-4 flex items-center gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-800 truncate">{u.full_name || "—"}</p>
+                        <p className="text-xs text-gray-500 truncate">{u.email}</p>
+                      </div>
+                      {u.id === session.user.id ? <span className={`px-2 py-0.5 rounded-full text-xs capitalize ${roleBadge[u.role]}`}>{u.role} (you)</span> : (
+                        <select value={u.role} onChange={(e) => handleRole(u, e.target.value)} className="border border-gray-200 rounded-lg px-2 py-1.5 text-xs bg-white">
+                          <option value="user">user</option><option value="staff">staff</option><option value="admin">admin</option>
+                        </select>
+                      )}
+                      {u.id !== session.user.id && (
+                        <button title="Delete account" onClick={() => setUserToDelete(u)} className="p-2 rounded-lg text-gray-500 hover:text-red-500"><Trash2 size={16} /></button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full">
+                    <thead><tr className="bg-gray-50 text-left text-xs text-gray-500">
+                      {["Name", "Email", "Role", "Actions"].map((h) => <th key={h} className="px-6 py-3 font-semibold">{h}</th>)}
+>>>>>>> 4d6617f (v5)
                     </tr></thead>
                     <tbody>
                       {users.map((u) => (
@@ -442,6 +668,14 @@ export default function App() {
                               </select>
                             )}
                           </td>
+<<<<<<< HEAD
+=======
+                          <td className="px-6 py-3.5">
+                            {u.id !== session.user.id && (
+                              <button title="Delete account" onClick={() => setUserToDelete(u)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-red-500"><Trash2 size={14} /></button>
+                            )}
+                          </td>
+>>>>>>> 4d6617f (v5)
                         </tr>
                       ))}
                     </tbody>
@@ -451,11 +685,19 @@ export default function App() {
             )}
           </main>
 
+<<<<<<< HEAD
           <div className="md:hidden border-t border-gray-100 bg-white flex shrink-0">
             {navItems.map(({ id, label, icon: Icon }) => (
               <button key={id} onClick={() => navigate(id)} className={`flex-1 flex flex-col items-center gap-0.5 py-3 relative ${activeTab === id ? "text-indigo-600 font-semibold" : "text-gray-400"}`}>
                 <Icon size={18} />
                 <span className="text-[0.6rem]">{label.split(" ")[0]}</span>
+=======
+          <div className="md:hidden border-t border-gray-100 bg-white flex shrink-0 pb-[env(safe-area-inset-bottom)]">
+            {navItems.map(({ id, short, icon: Icon }) => (
+              <button key={id} onClick={() => navigate(id)} className={`flex-1 flex flex-col items-center gap-0.5 py-3 relative ${activeTab === id ? "text-indigo-600 font-semibold" : "text-gray-400"}`}>
+                <Icon size={18} />
+                <span className="text-[0.65rem]">{short}</span>
+>>>>>>> 4d6617f (v5)
                 {id === "admin" && pendingClaims.length > 0 && <span className="absolute top-2 right-1/4 w-2 h-2 rounded-full bg-yellow-400" />}
               </button>
             ))}

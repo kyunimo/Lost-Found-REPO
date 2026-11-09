@@ -39,10 +39,25 @@ Refresh the page. Use the **Users** page to promote classmates/teachers to `staf
    `https://<username>.github.io/<repo-name>/`.
 5. Supabase → **Authentication → URL Configuration**: set **Site URL** to that address.
 
+<<<<<<< HEAD
+=======
+## Updating an existing database
+If you already ran `schema.sql` before, do **not** run it again. Run
+`supabase/migration-002-contacts-and-account-deletion.sql` once instead (SQL Editor → New query → Run).
+It adds the 3 contact fields, saved contact settings and account deletion.
+
+>>>>>>> 4d6617f (v5)
 ## Good to know
 - The anon key is meant to be public; security comes from the Row Level Security rules in `schema.sql`.
 - Supabase free projects **pause after ~7 days of no activity** — open the dashboard and click *Restore* before your defense.
 - Free limits (approx.): 500 MB database, 1 GB photo storage — plenty for a campus demo.
 - Matching = category + location + date closeness + text similarity (PostgreSQL `pg_trgm`). It only *suggests*; staff still verify claims.
 - Item contact details are hidden in the UI from other users, but are still readable through the API by signed-in users. For production, move contact info into a separate table with stricter rules.
+<<<<<<< HEAD
 - Not yet built (listed in the proposal scope): email/in-app notifications and profile editing screens.
+=======
+- Phones: compact card list, install-to-home-screen (PWA manifest in `public/`), lists refresh when you switch back to the app.
+- Dark mode: toggle in the header (or Profile → Appearance). Colours are defined at the bottom of `src/index.css`.
+- Not yet built (listed in the proposal scope): email/in-app notifications.
+- Deleting an account also deletes that person's reports (with photos), claims on those reports, and their own claims. Admins can delete any account from the Users page; the only admin can't delete themselves.
+>>>>>>> 4d6617f (v5)

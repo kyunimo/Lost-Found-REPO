@@ -59,6 +59,7 @@ export function ItemCard({ item, userId, isStaff, defaultName, defaultContact, o
 
   return (
     <>
+<<<<<<< HEAD
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
         <div className="relative h-44 overflow-hidden bg-gray-50">
           <img src={img} alt={item.name} className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).src = NO_IMAGE)} />
@@ -76,29 +77,67 @@ export function ItemCard({ item, userId, isStaff, defaultName, defaultContact, o
             <div className="flex items-center gap-2 text-xs text-gray-500"><Tag size={12} className="text-indigo-400" />Reported by: {item.reporter_name}</div>
           </div>
           <button onClick={() => setShowModal(true)} className="w-full py-2 rounded-xl text-sm text-indigo-600 border border-indigo-200 hover:bg-indigo-50 font-medium">
+=======
+      <div onClick={() => setShowModal(true)}
+        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-row sm:flex-col cursor-pointer sm:cursor-default active:scale-[0.99] sm:active:scale-100">
+        <div className="relative w-28 min-h-[7.5rem] shrink-0 sm:w-full sm:h-44 overflow-hidden bg-gray-50">
+          <img src={img} alt={item.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).src = NO_IMAGE)} />
+          <div className={`absolute top-2 left-2 sm:top-3 sm:left-3 flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs ${status.color}`}>
+            <StatusIcon size={11} /> {status.label}
+          </div>
+          <div className="hidden sm:block absolute top-3 right-3 bg-white/90 px-2 py-1 rounded-full text-xs text-gray-600">{item.category}</div>
+        </div>
+        <div className="p-3 sm:p-4 flex flex-col flex-1 min-w-0">
+          <h3 className="text-gray-900 mb-0.5 sm:mb-1 font-semibold truncate sm:whitespace-normal">{item.name}</h3>
+          <p className="text-xs sm:text-sm text-gray-500 mb-2 sm:mb-3 flex-1 line-clamp-2">{item.description}</p>
+          <div className="space-y-1 sm:space-y-1.5 sm:mb-4">
+            <div className="flex items-center gap-2 text-xs text-gray-500 min-w-0"><MapPin size={12} className="text-indigo-400 shrink-0" /><span className="truncate">{item.location}</span></div>
+            <div className="flex items-center gap-2 text-xs text-gray-500 min-w-0"><Calendar size={12} className="text-indigo-400 shrink-0" /><span className="truncate">{fmtDate(item.item_date)}<span className="sm:hidden"> · {item.category}</span></span></div>
+            <div className="hidden sm:flex items-center gap-2 text-xs text-gray-500"><Tag size={12} className="text-indigo-400" />Reported by: {item.reporter_name}</div>
+          </div>
+          <button onClick={(e) => { e.stopPropagation(); setShowModal(true); }} className="hidden sm:block w-full py-2 rounded-xl text-sm text-indigo-600 border border-indigo-200 hover:bg-indigo-50 font-medium">
+>>>>>>> 4d6617f (v5)
             View Details
           </button>
         </div>
       </div>
 
       {showModal && (
+<<<<<<< HEAD
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" onClick={close}>
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="relative h-56 bg-gray-100">
               <img src={img} alt={item.name} className="w-full h-full object-cover" />
               <button onClick={close} className="absolute top-3 right-3 bg-white rounded-full px-2 py-1 shadow text-gray-500 hover:text-gray-800">✕</button>
+=======
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm sm:p-4" onClick={close}>
+          <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl sm:max-w-md w-full overflow-hidden max-h-[92dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+            <div className="relative h-48 sm:h-56 bg-gray-100">
+              <img src={img} alt={item.name} className="w-full h-full object-cover" />
+              <button onClick={close} className="absolute top-3 right-3 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow text-gray-500 hover:text-gray-800">✕</button>
+>>>>>>> 4d6617f (v5)
               <div className={`absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full text-xs ${status.color}`}>
                 <StatusIcon size={12} /> {status.label}
               </div>
             </div>
+<<<<<<< HEAD
             <div className="p-6">
+=======
+            <div className="p-5 sm:p-6 pb-[calc(1.25rem+env(safe-area-inset-bottom))]">
+>>>>>>> 4d6617f (v5)
               <h2 className="text-gray-900 mb-2 text-xl font-bold">{item.name}</h2>
               <p className="text-sm text-gray-600 mb-4">{item.description}</p>
               <div className="space-y-2 mb-5">
                 <div className="flex items-center gap-2 text-sm text-gray-600"><MapPin size={14} className="text-indigo-500" />{item.location}</div>
                 <div className="flex items-center gap-2 text-sm text-gray-600"><Calendar size={14} className="text-indigo-500" />{fmtDate(item.item_date)}</div>
                 <div className="flex items-center gap-2 text-sm text-gray-600"><Tag size={14} className="text-indigo-500" />Reported by: {item.reporter_name}</div>
+<<<<<<< HEAD
                 {canSeeContact && <div className="text-sm text-gray-600">📞 Contact: {item.contact}</div>}
+=======
+                {canSeeContact && [item.contact, item.contact_2, item.contact_3].filter(Boolean).map((c, i) => (
+                  <div key={i} className="text-sm text-gray-600">📞 {i === 0 ? "Contact: " : ""}{c}</div>
+                ))}
+>>>>>>> 4d6617f (v5)
               </div>
 
               {matches.length > 0 && (
