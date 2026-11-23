@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MapPin, Calendar, Tag, CheckCircle, Clock, AlertCircle, Sparkles } from "lucide-react";
+import { MapPin, Calendar, Tag, CheckCircle, Clock, AlertCircle, Sparkles, Maximize2, X } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { fmtDate, Item, Match } from "../lib/types";
 
@@ -28,6 +28,7 @@ interface Props {
 
 export function ItemCard({ item, userId, isStaff, defaultName, defaultContact, onClaim, onFoundIt }: Props) {
   const [showModal, setShowModal] = useState(false);
+  const [showImage, setShowImage] = useState(false);
   const [showClaimForm, setShowClaimForm] = useState(false);
   const [claimantName, setClaimantName] = useState(defaultName);
   const [claimantContact, setClaimantContact] = useState(defaultContact);
@@ -46,7 +47,16 @@ export function ItemCard({ item, userId, isStaff, defaultName, defaultContact, o
     supabase.rpc("suggest_matches", { p_item_id: item.id }).then(({ data }) => setMatches(data ?? []));
   }, [showModal, item.id, item.status]);
 
-  const close = () => { setShowModal(false); setShowClaimForm(false); };
+  useEffect(() => {
+    if (!showImage) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowImage(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [showImage]);
+
+  const close = () => { setShowModal(false); setShowClaimForm(false); setShowImage(false); };
 
   const submitClaim = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +72,10 @@ export function ItemCard({ item, userId, isStaff, defaultName, defaultContact, o
       <div onClick={() => setShowModal(true)}
         className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-row sm:flex-col cursor-pointer sm:cursor-default active:scale-[0.99] sm:active:scale-100">
         <div className="relative w-28 min-h-[7.5rem] shrink-0 sm:w-full sm:h-44 overflow-hidden bg-gray-50">
-          <img src={img} alt={item.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).src = NO_IMAGE)} />
+          <button type="button" aria-label={`Enlarge photo of ${item.name}`} onClick={(e) => { e.stopPropagation(); setShowImage(true); }} className="absolute inset-0 w-full h-full group">
+            <img src={img} alt={item.name} className="absolute inset-0 w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).src = NO_IMAGE)} />
+            <span className="absolute bottom-2 right-2 hidden sm:flex items-center justify-center w-8 h-8 rounded-full bg-black/55 text-white opacity-0 group-hover:opacity-100 transition-opacity"><Maximize2 size={16} /></span>
+          </button>
           <div className={`absolute top-2 left-2 sm:top-3 sm:left-3 flex items-center gap-1 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs ${status.color}`}>
             <StatusIcon size={11} /> {status.label}
           </div>
@@ -86,8 +99,11 @@ export function ItemCard({ item, userId, isStaff, defaultName, defaultContact, o
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm sm:p-4" onClick={close}>
           <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl sm:max-w-md w-full overflow-hidden max-h-[92dvh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
             <div className="relative h-48 sm:h-56 bg-gray-100">
-              <img src={img} alt={item.name} className="w-full h-full object-cover" />
-              <button onClick={close} className="absolute top-3 right-3 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow text-gray-500 hover:text-gray-800">✕</button>
+              <button type="button" aria-label={`Enlarge photo of ${item.name}`} onClick={() => setShowImage(true)} className="w-full h-full cursor-zoom-in group">
+                <img src={img} alt={item.name} className="w-full h-full object-cover" onError={(e) => ((e.target as HTMLImageElement).src = NO_IMAGE)} />
+                <span className="absolute bottom-3 right-3 flex items-center gap-1 px-2.5 py-1.5 rounded-full bg-black/55 text-white text-xs opacity-90"><Maximize2 size={14} /> Enlarge</span>
+              </button>
+              <button onClick={close} aria-label="Close details" className="absolute top-3 right-3 bg-white rounded-full w-10 h-10 flex items-center justify-center shadow text-gray-500 hover:text-gray-800"><X size={18} /></button>
               <div className={`absolute bottom-3 left-3 flex items-center gap-1 px-2 py-1 rounded-full text-xs ${status.color}`}>
                 <StatusIcon size={12} /> {status.label}
               </div>
@@ -153,6 +169,15 @@ export function ItemCard({ item, userId, isStaff, defaultName, defaultContact, o
               )}
             </div>
           </div>
+        </div>
+      )}
+
+      {showImage && (
+        <div className="fixed inset-0 z-[70] bg-black/90 flex items-center justify-center p-3 sm:p-8" onClick={() => setShowImage(false)} role="dialog" aria-modal="true" aria-label={`Enlarged photo of ${item.name}`}>
+          <button type="button" aria-label="Close enlarged photo" onClick={() => setShowImage(false)} className="absolute top-4 right-4 z-10 w-11 h-11 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black/80">
+            <X size={22} />
+          </button>
+          <img src={img} alt={item.name} onError={(e) => ((e.target as HTMLImageElement).src = NO_IMAGE)} onClick={(e) => e.stopPropagation()} className="max-w-full max-h-full object-contain rounded-lg shadow-2xl select-none" />
         </div>
       )}
     </>
